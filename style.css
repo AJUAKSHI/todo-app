@@ -76,6 +76,7 @@ button:hover{
     background: #f9f9f9;
     border: 1px solid #eee;
     border-radius: 8px;
+    cursor: pointer;
 }
 
 .task-item span{
