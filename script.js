@@ -2,37 +2,52 @@ const addBtn = document.getElementById('add-btn')
 const taskInput = document.getElementById('task-input')
 const taskList = document.getElementById('task-list')
 
-addBtn.addEventListener('click',function(){
-    const taskText = taskInput.value
-    
-    //don't add empty tasks
-    if (taskText === '') return
+// Load tasks from localStorage when page opens
+let tasks = JSON.parse(localStorage.getItem('tasks')) || []
+renderTasks()
 
-    //create a new list
+function renderTasks() {
+  taskList.innerHTML = ''
+  tasks.forEach(function(task, index) {
     const li = document.createElement('li')
-    li.classList.add('task-item')   
+    li.classList.add('task-item')
+    if (task.done) li.classList.add('done')
 
-    //put html inside it
     li.innerHTML = `
-        <span>${taskText}</span>
-        <button class="delete-btn">X</button>    
+      <span>${task.text}</span>
+      <button class="delete-btn">✕</button>
     `
 
-    //add it to the list
     taskList.appendChild(li)
 
-    //clear the input value
-    taskInput.value = ''
-
-    //delete button logic
-    const deleteBtn = li.querySelector('.delete-btn')
-    deleteBtn.addEventListener('click',function(){
-        li.remove()
-    })
-
-    //click task to mark done
+    // Mark done
     const span = li.querySelector('span')
-    span.addEventListener('click',function(){
-        li.classList.toggle('done')
+    span.addEventListener('click', function() {
+      tasks[index].done = !tasks[index].done
+      saveTasks()
+      renderTasks()
     })
+
+    // Delete
+    const deleteBtn = li.querySelector('.delete-btn')
+    deleteBtn.addEventListener('click', function() {
+      tasks.splice(index, 1)
+      saveTasks()
+      renderTasks()
+    })
+  })
+}
+
+function saveTasks() {
+  localStorage.setItem('tasks', JSON.stringify(tasks))
+}
+
+addBtn.addEventListener('click', function() {
+  const taskText = taskInput.value
+  if (taskText === '') return
+
+  tasks.push({ text: taskText, done: false })
+  saveTasks()
+  renderTasks()
+  taskInput.value = ''
 })
